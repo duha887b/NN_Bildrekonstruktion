@@ -8,6 +8,9 @@ close all
 %% Load training data
 % load file "DATA_MMF_28.mat"
 
+load("DATA_MMF_16.mat")
+
+
 %% Create Neural Network Layergraph MLP
 % Layers = [];
 

@@ -8,13 +8,14 @@ close all
 %% Load training data
 % load file "DATA_MMF_28.mat"
 
-load("DATA_MMF_16.mat")
+load("DATA_MMF_16_aug.mat")
+%load("DATA_MMF_16.mat")
 
 
 %% Create Neural Network Layergraph MLP
 
-inputDim = size(XTest); %Dimension des Input
-outputDim = size(YTest); %Dimensionen Output
+inputDim = size(XTrain); %Dimension des Input
+outputDim = size(YTrain); %Dimensionen Output
 I_px = inputDim(1);
 O_px = outputDim(1);
 
@@ -61,15 +62,18 @@ Ypred = predict(trainedNet,XTest);
 %% Evaluate Network
 % calculate RMSE, Correlation, SSIM, PSNR
 
-Pred_rmse = rmse(Ypred,single(YTest));
-Pred_corr = corrcoef(Ypred,single(YTest));
 
+Pred_rmse = rmse(Ypred(),single(YTest()));
 ypredDim = size(Ypred);
-for i = 1 : ypredDim(4)
-    Pred_ssim(i) = ssim(Ypred(:,:,:, i),single(YTest(:,:,:,i)));
-end
 
-Pred_psnr = psnr(Ypred,single(YTest));
+
+for i = 1 : ypredDim(4)
+    
+    Pred_ssim(i) = ssim(Ypred(:,:,:, i),single(YTest(:,:,:,i)));
+    Pred_psnr(i) = psnr(Ypred(:,:,:, i),single(YTest(:,:,:,i)));    
+    Pred_corr(:,:,1,i) = xcorr2(Ypred(:,:,:, 1),single(YTest(:,:,:,1)));
+
+end
 
 %% Boxplots for step 6 of instructions
 

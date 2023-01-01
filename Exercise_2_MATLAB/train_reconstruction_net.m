@@ -27,9 +27,32 @@ reluLayer('Name','Relu2')
 depthToSpace2dLayer([O_px O_px],'Name','dts1')
 regressionLayer('Name','Output')
 ];
+
+%analyzeNetwork(layers)
 %% Training network
 % define "trainingOptions"
+
+options = trainingOptions("sgdm");
+
+options.MiniBatchSize = 64;
+
+options.MaxEpochs = 100;
+
+options.InitialLearnRate = 0.001;
+
+options.ExecutionEnvironment = 'auto';
+
+options.OutputNetwork = 'best-validation-loss';
+
+options.ValidationData = {XValid, YValid};
+
+options.Plots = 'training-progress';
+
+options.ValidationPatience = 100;
+
 % training using "trainNetwork"
+
+trainedNet = trainNetwork(XTrain,YTrain,layers,options);
 
 %% Calculate Prediction 
 % use command "predict"

@@ -13,12 +13,13 @@ for i1=1:N
     original_image = XTrain(:,:,:,i1);
     
     % Data Augmentation 1
-    % aug_image = function(original_image); 
+    angle = 350 * rand(1);
+    aug_image = imrotate(original_image,angle); 
     
     [XTrain_aug(:,:,:,i1), YTrain_aug(:,:,:,i1)] = mmf(aug_image,r,M_T,modes_n);
     
     % Data Augmentation 2
-    % aug_image = function(original_image);
+    aug_image = circshift(original_image,[8 8]);
     
     [XTrain_aug(:,:,:,N+i1), YTrain_aug(:,:,:,N+i1)] = mmf(aug_image,r,M_T,modes_n);
     

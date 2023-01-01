@@ -56,9 +56,20 @@ trainedNet = trainNetwork(XTrain,YTrain,layers,options);
 
 %% Calculate Prediction 
 % use command "predict"
+Ypred = predict(trainedNet,XTest);
 
 %% Evaluate Network
 % calculate RMSE, Correlation, SSIM, PSNR
+
+Pred_rmse = rmse(Ypred,single(YTest));
+Pred_corr = corrcoef(Ypred,single(YTest));
+
+ypredDim = size(Ypred);
+for i = 1 : ypredDim(4)
+    Pred_ssim(i) = ssim(Ypred(:,:,:, i),single(YTest(:,:,:,i)));
+end
+
+Pred_psnr = psnr(Ypred,single(YTest));
 
 %% Boxplots for step 6 of instructions
 

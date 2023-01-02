@@ -86,25 +86,32 @@ for i=1:size(Pred_rmse,4)
 end
 Pred_rmse_d = tmp/size(Pred_rmse,4);
 
-
-% Pred_corr = xcorr2(Ypred(:,:,1, 1),single(YTest(:,:,1,1)));
-% Pred_corr
-
-
-% 
 for i = 1 : ypredDim(4)
-%     
+     
     Pred_ssim(i) = ssim(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
-%     Pred_psnr(i) = psnr(Ypred(:,:,:, i),single(YTest(:,:,:,i)));    
-%     Pred_corr(:,:,1,i) = xcorr2(Ypred(:,:,:, i),single(YTest(:,:,:,i)));
-% 
+    Pred_psnr(i) = psnr(Ypred(:,:,1, i),single(YTest(:,:,1,i)));    
+    Pred_corr(i) = corr2(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
+ 
 end
 
+%Durchsnitt SSIM, PSNR, CORR
 tmp=0;
 for i=1:size(Pred_ssim,2)
     tmp = tmp + Pred_ssim(1,i);
 end
 Pred_ssim_d = tmp/size(Pred_ssim,2);
+
+tmp=0;
+for i=1:size(Pred_psnr,2)
+    tmp = tmp + Pred_psnr(1,i);
+end
+Pred_psnr_d = tmp/size(Pred_psnr,2);
+
+tmp=0;
+for i=1:size(Pred_corr,2)
+    tmp = tmp + Pred_corr(1,i);
+end
+Pred_corr_d = tmp/size(Pred_corr,2);
 
 
 %% Boxplots for step 6 of instructions

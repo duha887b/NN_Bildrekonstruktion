@@ -36,7 +36,7 @@ options = trainingOptions("adam");
 
 options.MiniBatchSize = 128;
 
-options.MaxEpochs = 100;
+options.MaxEpochs = 50;
 
 options.InitialLearnRate = 0.001;
 
@@ -48,15 +48,15 @@ options.ValidationData = {XValid, YValid};
 
 options.Plots = 'training-progress';
 
-options.ValidationPatience = 100;
+options.ValidationPatience = 70;
 
 % training using "trainNetwork"
 
-trainedNet = trainNetwork(XTrain,YTrain,layers,options);
+mlp = trainNetwork(XTrain,YTrain,layers,options);
 
 %% Calculate Prediction 
 % use command "predict"
-Ypred = predict(trainedNet,XTest);
+Ypred = predict(mlp,XTest);
 
 %% Evaluate Network
 % calculate RMSE, Correlation, SSIM, PSNR
@@ -68,11 +68,11 @@ Pred_rmse = rmse(Ypred(),single(YTest()));
 k=0;
 for i=1:10
     k = k+1;
-    subplot(10,3,k), imshow(XTest(:,:,:,i)),title('Input')
+    subplot(10,3,k), imshow(XTest(:,:,:,i),[0 255]),title('Input')
     k = k+1;
-    subplot(10,3,k), imshow(YTest(:,:,:,i)),title('Output')
+    subplot(10,3,k), imshow(YTest(:,:,:,i),[0 255]),title('Output')
     k = k+1;
-    subplot(10,3,k), imshow(Ypred(:,:,:,i)),title('Output Prediction')
+    subplot(10,3,k), imshow(Ypred(:,:,:,i),[0 255]),title('Output Prediction')
 end
 
 
@@ -105,20 +105,20 @@ layers = replaceLayer(layers,'Segmentation-Layer',regLayer);
 
 layers = connectLayers(layers,'Final-ConvolutionLayer','Reg-Layer');
 
-analyzeNetwork(layers)
+%analyzeNetwork(layers)
 
-trainedUNet = trainNetwork(XTrain,YTrain,layers,options);
+unet = trainNetwork(XTrain,YTrain,layers,options);
 
 %% Evaluate Network
-Ypred = predict(trainedUNet,XTest);
-
+Ypred = predict(unet,XTest);
+k=0;
 for i=1:10
     k = k+1;
-    subplot(10,3,k), imshow(XTest(:,:,:,i)),title('Input')
+    subplot(10,3,k), imshow(XTest(:,:,:,i),[0 255]),title('Input')
     k = k+1;
-    subplot(10,3,k), imshow(YTest(:,:,:,i)),title('Output')
+    subplot(10,3,k), imshow(YTest(:,:,:,i),[0 255]),title('Output')
     k = k+1;
-    subplot(10,3,k), imshow(Ypred(:,:,:,i)),title('Output Prediction')
+    subplot(10,3,k), imshow(Ypred(:,:,:,i),[0 255]),title('Output Prediction')
 end
 
 %% Boxplots for step 8 of instructions

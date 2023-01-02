@@ -19,7 +19,7 @@ for i1=1:N
     [XTrain_aug(:,:,:,i1), YTrain_aug(:,:,:,i1)] = mmf(aug_image,r,M_T,modes_n);
     
     % Data Augmentation 2
-    aug_image = circshift(original_image,[8 8]);
+    aug_image = circshift(original_image,[2 2]);
     
     [XTrain_aug(:,:,:,N+i1), YTrain_aug(:,:,:,N+i1)] = mmf(aug_image,r,M_T,modes_n);
     

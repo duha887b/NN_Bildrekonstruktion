@@ -123,24 +123,24 @@ subplot(2,2,4), boxchart(Pred_psnr),title('PSNR');
 
 %% Step 7: create Neural Network Layergraph U-Net
 
-layers = unetLayers([I_px I_px 1],2,'encoderDepth',3);
+Ulayers = unetLayers([I_px I_px 1],2,'encoderDepth',3);
  
 finalConvLayer = convolution2dLayer(1,1,'Padding','same','Stride',1,'Name','Final-ConvolutionLayer');
-layers = replaceLayer(layers,'Final-ConvolutionLayer',finalConvLayer);
+Ulayers = replaceLayer(Ulayers,'Final-ConvolutionLayer',finalConvLayer);
 
-layers = removeLayers(layers,'Softmax-Layer');
+Ulayers = removeLayers(Ulayers,'Softmax-Layer');
 
 regLayer = regressionLayer('Name','Reg-Layer');
-layers = replaceLayer(layers,'Segmentation-Layer',regLayer);
+Ulayers = replaceLayer(Ulayers,'Segmentation-Layer',regLayer);
 
-layers = connectLayers(layers,'Final-ConvolutionLayer','Reg-Layer');
+Ulayers = connectLayers(Ulayers,'Final-ConvolutionLayer','Reg-Layer');
 
 %analyzeNetwork(layers)
 
-unet = trainNetwork(XTrain,YTrain,layers,options);
+unet = trainNetwork(XTrain,YTrain,Ulayers,options);
 
 %% Evaluate Network
-Ypred = predict(unet,XTest);
+UYpred = predict(unet,XTest);
 
 figure
 k=0;
@@ -150,14 +150,14 @@ for i=1:10
     k = k+1;
     subplot(10,3,k), imshow(YTest(:,:,:,i),[0 255]),title('Output')
     k = k+1;
-    subplot(10,3,k), imshow(Ypred(:,:,:,i),[0 255]),title('Output Prediction');
+    subplot(10,3,k), imshow(UYpred(:,:,:,i),[0 255]),title('Output Prediction');
 
 end
 
-ypredDim = size(Ypred);
+ypredDim = size(UYpred);
 
 % RSME pro Bild und Durchschnitt
-Pred_rmse_tmp = rmse(Ypred(),single(YTest()),[1 2]);
+Pred_rmse_tmp = rmse(UYpred(),single(YTest()),[1 2]);
 tmp = 0;
 for i=1:size(Pred_rmse_tmp,4)
     tmp = tmp + Pred_rmse_tmp(:,:,1,i);
@@ -166,9 +166,9 @@ UPred_rmse_d = tmp/size(Pred_rmse_tmp,4);
 
 for i = 1 : ypredDim(4)
      
-    UPred_ssim(i) = ssim(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
-    UPred_psnr(i) = psnr(Ypred(:,:,1, i),single(YTest(:,:,1,i)));    
-    UPred_corr(i) = corr2(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
+    UPred_ssim(i) = ssim(UYpred(:,:,1, i),single(YTest(:,:,1,i)));
+    UPred_psnr(i) = psnr(UYpred(:,:,1, i),single(YTest(:,:,1,i)));    
+    UPred_corr(i) = corr2(UYpred(:,:,1, i),single(YTest(:,:,1,i)));
     UPred_rmse(i) = Pred_rmse_tmp(:,:,1,i);
 end
 
@@ -193,6 +193,9 @@ UPred_corr_d = tmp/size(UPred_corr,2);
 
 %% Boxplots for step 8 of instructions
 figure
-subplot(2,2,1), boxchart(Pred_rmse,UPred_rmse ),title('o') ;
+subplot(2,2,1), boxchart([UPred_rmse; Pred_rmse]'),title('RMSE'), ylabel('RMSE') ,legend(["1:MLP 2:Unet"]);
+subplot(2,2,2), boxchart([UPred_corr; Pred_corr]'),title('Correlation'), ylabel('Correlation') ,legend(["1:MLP 2:Unet"]) ;
+subplot(2,2,3), boxchart([UPred_psnr; Pred_psnr]'),title('PSNR'), ylabel('PSNR') ,legend(["1:MLP 2:Unet"]) ;
+subplot(2,2,4), boxchart([UPred_ssim; Pred_ssim]'),title('SSIM'), ylabel('SSIM') ,legend(["1:MLP 2:Unet"]) ;
 
         

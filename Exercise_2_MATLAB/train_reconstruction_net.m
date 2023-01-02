@@ -94,14 +94,31 @@ end
 %% Step 7: create Neural Network Layergraph U-Net
 
 layers = unetLayers([I_px I_px 1],2,'encoderDepth',3);
+ 
 finalConvLayer = convolution2dLayer(1,1,'Padding','same','Stride',1,'Name','Final-ConvolutionLayer');
-layers = replaceLayer(layers,'Final-ConvolutionalLayer',finalConvLayer);
+layers = replaceLayer(layers,'Final-ConvolutionLayer',finalConvLayer);
+
 layers = removeLayers(layers,'Softmax-Layer');
+
 regLayer = regressionLayer('Name','Reg-Layer');
 layers = replaceLayer(layers,'Segmentation-Layer',regLayer);
+
 layers = connectLayers(layers,'Final-ConvolutionLayer','Reg-Layer');
 
 analyzeNetwork(layers)
 
+trainedUNet = trainNetwork(XTrain,YTrain,layers,options);
+
+%% Evaluate Network
+Ypred = predict(trainedUNet,XTest);
+
+for i=1:10
+    k = k+1;
+    subplot(10,3,k), imshow(XTest(:,:,:,i)),title('Input')
+    k = k+1;
+    subplot(10,3,k), imshow(YTest(:,:,:,i)),title('Output')
+    k = k+1;
+    subplot(10,3,k), imshow(Ypred(:,:,:,i)),title('Output Prediction')
+end
 
 %% Boxplots for step 8 of instructions

@@ -11,7 +11,6 @@ close all
 load("DATA_MMF_16_aug.mat")
 %load("DATA_MMF_16.mat")
 
-
 %% Create Neural Network Layergraph MLP
 
 inputDim = size(XTrain); %Dimension des Input
@@ -33,9 +32,9 @@ regressionLayer('Name','Output')
 %% Training network
 % define "trainingOptions"
 
-options = trainingOptions("sgdm");
+options = trainingOptions("adam");
 
-options.MiniBatchSize = 64;
+options.MiniBatchSize = 128;
 
 options.MaxEpochs = 100;
 
@@ -64,6 +63,19 @@ Ypred = predict(trainedNet,XTest);
 
 
 Pred_rmse = rmse(Ypred(),single(YTest()));
+
+% Anzeigen einiger Ergebnisse für visuelle Kontrolle 
+k=0;
+for i=1:10
+    k = k+1;
+    subplot(10,3,k), imshow(XTest(:,:,:,i)),title('Input')
+    k = k+1;
+    subplot(10,3,k), imshow(YTest(:,:,:,i)),title('Output')
+    k = k+1;
+    subplot(10,3,k), imshow(Ypred(:,:,:,i)),title('Output Prediction')
+end
+
+
 ypredDim = size(Ypred);
 
 
@@ -75,9 +87,21 @@ for i = 1 : ypredDim(4)
 
 end
 
+
+
 %% Boxplots for step 6 of instructions
 
 %% Step 7: create Neural Network Layergraph U-Net
-% Layers = [];
+
+layers = unetLayers([I_px I_px 1],2,'encoderDepth',3);
+finalConvLayer = convolution2dLayer(1,1,'Padding','same','Stride',1,'Name','Final-ConvolutionLayer');
+layers = replaceLayer(layers,'Final-ConvolutionalLayer',finalConvLayer);
+layers = removeLayers(layers,'Softmax-Layer');
+regLayer = regressionLayer('Name','Reg-Layer');
+layers = replaceLayer(layers,'Segmentation-Layer',regLayer);
+layers = connectLayers(layers,'Final-ConvolutionLayer','Reg-Layer');
+
+analyzeNetwork(layers)
+
 
 %% Boxplots for step 8 of instructions

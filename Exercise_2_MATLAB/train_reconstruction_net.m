@@ -61,37 +61,35 @@ Ypred = predict(mlp,XTest);
 %% Evaluate Network
 % calculate RMSE, Correlation, SSIM, PSNR
 
-
-
-
-% Anzeigen einiger Ergebnisse für visuelle Kontrolle 
-% k=0;
-% for i=1:10
-%     k = k+1;
-%     subplot(10,3,k), imshow(XTest(:,:,:,i),[0 255]),title('Input')
-%     k = k+1;
-%     subplot(10,3,k), imshow(YTest(:,:,:,i),[0 255]),title('Output')
-%     k = k+1;
-%     subplot(10,3,k), imshow(Ypred(:,:,:,i),[0 255]),title('Output Prediction')
-% end
+%Anzeigen einiger Ergebnisse für visuelle Kontrolle 
+figure
+k=0;
+for i=1:10
+    k = k+1;
+    subplot(10,3,k), imshow(XTest(:,:,:,i),[0 255]),title('Input')
+    k = k+1;
+    subplot(10,3,k), imshow(YTest(:,:,:,i),[0 255]),title('Output')
+    k = k+1;
+    subplot(10,3,k), imshow(Ypred(:,:,:,i),[0 255]),title('Output Prediction')
+end
 
 
 ypredDim = size(Ypred);
 
 % RSME pro Bild und Durchschnitt
-Pred_rmse = rmse(Ypred(),single(YTest()),[1 2]);
+Pred_rmse_tmp = rmse(Ypred(),single(YTest()),[1 2]);
 tmp = 0;
-for i=1:size(Pred_rmse,4)
-    tmp = tmp + Pred_rmse(:,:,1,i);
+for i=1:size(Pred_rmse_tmp,4)
+    tmp = tmp + Pred_rmse_tmp(:,:,1,i);
 end
-Pred_rmse_d = tmp/size(Pred_rmse,4);
+Pred_rmse_d = tmp/size(Pred_rmse_tmp,4);
 
 for i = 1 : ypredDim(4)
      
     Pred_ssim(i) = ssim(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
     Pred_psnr(i) = psnr(Ypred(:,:,1, i),single(YTest(:,:,1,i)));    
     Pred_corr(i) = corr2(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
- 
+    Pred_rmse(i) = Pred_rmse_tmp(:,:,1,i);
 end
 
 %Durchsnitt SSIM, PSNR, CORR
@@ -115,7 +113,13 @@ Pred_corr_d = tmp/size(Pred_corr,2);
 
 
 %% Boxplots for step 6 of instructions
-boxchart(Pred_rmse)
+
+figure
+subplot(2,2,1), boxchart(Pred_rmse),title('RMSE') ;
+subplot(2,2,2), boxchart(Pred_corr),title('Correlation');
+subplot(2,2,3), boxchart(Pred_ssim),title('SSIM');
+subplot(2,2,4), boxchart(Pred_psnr),title('PSNR');
+        
 
 %% Step 7: create Neural Network Layergraph U-Net
 
@@ -137,6 +141,8 @@ unet = trainNetwork(XTrain,YTrain,layers,options);
 
 %% Evaluate Network
 Ypred = predict(unet,XTest);
+
+figure
 k=0;
 for i=1:10
     k = k+1;
@@ -144,7 +150,49 @@ for i=1:10
     k = k+1;
     subplot(10,3,k), imshow(YTest(:,:,:,i),[0 255]),title('Output')
     k = k+1;
-    subplot(10,3,k), imshow(Ypred(:,:,:,i),[0 255]),title('Output Prediction')
+    subplot(10,3,k), imshow(Ypred(:,:,:,i),[0 255]),title('Output Prediction');
+
 end
 
+ypredDim = size(Ypred);
+
+% RSME pro Bild und Durchschnitt
+Pred_rmse_tmp = rmse(Ypred(),single(YTest()),[1 2]);
+tmp = 0;
+for i=1:size(Pred_rmse_tmp,4)
+    tmp = tmp + Pred_rmse_tmp(:,:,1,i);
+end
+UPred_rmse_d = tmp/size(Pred_rmse_tmp,4);
+
+for i = 1 : ypredDim(4)
+     
+    UPred_ssim(i) = ssim(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
+    UPred_psnr(i) = psnr(Ypred(:,:,1, i),single(YTest(:,:,1,i)));    
+    UPred_corr(i) = corr2(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
+    UPred_rmse(i) = Pred_rmse_tmp(:,:,1,i);
+end
+
+%Durchsnitt SSIM, PSNR, CORR
+tmp=0;
+for i=1:size(UPred_ssim,2)
+    tmp = tmp + UPred_ssim(1,i);
+end
+UPred_ssim_d = tmp/size(UPred_ssim,2);
+
+tmp=0;
+for i=1:size(UPred_psnr,2)
+    tmp = tmp + UPred_psnr(1,i);
+end
+UPred_psnr_d = tmp/size(UPred_psnr,2);
+
+tmp=0;
+for i=1:size(UPred_corr,2)
+    tmp = tmp + UPred_corr(1,i);
+end
+UPred_corr_d = tmp/size(UPred_corr,2);
+
 %% Boxplots for step 8 of instructions
+figure
+subplot(2,2,1), boxchart(Pred_rmse,UPred_rmse ),title('o') ;
+
+        

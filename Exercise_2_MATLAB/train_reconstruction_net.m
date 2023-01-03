@@ -232,9 +232,9 @@ UPred_corr_d = tmp/size(UPred_corr,2);
 
 %% Boxplots for step 8 of instructions
 figure
-subplot(2,2,1), boxchart([UPred_rmse; Pred_rmse]'),title('RMSE'), ylabel('RMSE') ,legend(["1:MLP 2:Unet"]);
-subplot(2,2,2), boxchart([UPred_corr; Pred_corr]'),title('Correlation'), ylabel('Correlation') ,legend(["1:MLP 2:Unet"]) ;
-subplot(2,2,3), boxchart([UPred_psnr; Pred_psnr]'),title('PSNR'), ylabel('PSNR') ,legend(["1:MLP 2:Unet"]) ;
-subplot(2,2,4), boxchart([UPred_ssim; Pred_ssim]'),title('SSIM'), ylabel('SSIM') ,legend(["1:MLP 2:Unet"]) ;
+subplot(2,2,1), boxchart([UPred_rmse; Pred_rmse_aug]'),title('RMSE'), ylabel('RMSE') ,legend(["1:Unet 2:MLP"]);
+subplot(2,2,2), boxchart([UPred_corr; Pred_corr_aug]'),title('Correlation'), ylabel('Correlation') ,legend(["1:Unet 2:MLP"]) ;
+subplot(2,2,3), boxchart([UPred_psnr; Pred_psnr_aug]'),title('PSNR'), ylabel('PSNR') ,legend(["1:Unet 2:MLP"]) ;
+subplot(2,2,4), boxchart([UPred_ssim; Pred_ssim_aug]'),title('SSIM'), ylabel('SSIM') ,legend(["1:Unet 2:MLP"]) ;
 
         

@@ -57,6 +57,7 @@ mlp_aug = trainNetwork(XTrain,YTrain,layers,options);
 load("DATA_MMF_16.mat")
 mlp = trainNetwork(XTrain,YTrain,layers,options);
 
+
 %% Calculate Prediction 
 % use command "predict"
 Ypred = predict(mlp,XTest);
@@ -156,6 +157,8 @@ subplot(2,2,4), boxchart(Pred_psnr),title('PSNR');
         
 
 %% Step 7: create Neural Network Layergraph U-Net
+
+load("DATA_MMF_16_aug.mat")
 
 Ulayers = unetLayers([I_px I_px 1],2,'encoderDepth',3);
  

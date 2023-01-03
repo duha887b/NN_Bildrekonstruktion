@@ -34,29 +34,63 @@ regressionLayer('Name','Output')
 
 options = trainingOptions("adam");
 
-options.MiniBatchSize = 128;
+options.MiniBatchSize = 64;
 
-options.MaxEpochs = 50;
+options.MaxEpochs = 200;
+
+options.ValidationFrequency = 150;
 
 options.InitialLearnRate = 0.001;
 
 options.ExecutionEnvironment = 'auto';
 
-options.OutputNetwork = 'best-validation-loss';
-
 options.ValidationData = {XValid, YValid};
 
 options.Plots = 'training-progress';
 
-options.ValidationPatience = 70;
+options.ValidationPatience = 20;
 
-% training using "trainNetwork"
+%% training using "trainNetwork"
 
+mlp_aug = trainNetwork(XTrain,YTrain,layers,options);
+
+load("DATA_MMF_16.mat")
 mlp = trainNetwork(XTrain,YTrain,layers,options);
 
 %% Calculate Prediction 
 % use command "predict"
 Ypred = predict(mlp,XTest);
+Ypred_aug = predict(mlp_aug,XTest);
+
+%% Aufgabe 3 Protokoll
+
+% RSME pro Bild und Durchschnitt
+Pred_rmse_tmp = rmse(Ypred(),single(YTest()),[1 2]);
+
+for i = 1 : size(Ypred,4)
+     
+    Pred_ssim(i) = ssim(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
+    Pred_psnr(i) = psnr(Ypred(:,:,1, i),single(YTest(:,:,1,i)));    
+    Pred_corr(i) = corr2(Ypred(:,:,1, i),single(YTest(:,:,1,i)));
+    Pred_rmse(i) = Pred_rmse_tmp(:,:,1,i);
+end
+
+Pred_rmse_tmp = rmse(Ypred_aug(),single(YTest()),[1 2]);
+
+for i = 1 : size(Ypred_aug,4)
+     
+    Pred_ssim_aug(i) = ssim(Ypred_aug(:,:,1, i),single(YTest(:,:,1,i)));
+    Pred_psnr_aug(i) = psnr(Ypred_aug(:,:,1, i),single(YTest(:,:,1,i)));    
+    Pred_corr_aug(i) = corr2(Ypred_aug(:,:,1, i),single(YTest(:,:,1,i)));
+    Pred_rmse_aug(i) = Pred_rmse_tmp(:,:,1,i);
+end
+
+figure
+subplot(2,2,1), boxchart([Pred_rmse; Pred_rmse_aug]'),title('RMSE'), ylabel('RMSE') ,legend(["1:Original 2:Data Augmentation"]);
+subplot(2,2,2), boxchart([Pred_corr; Pred_corr_aug]'),title('Correlation'), ylabel('Correlation') ,legend(["1:Original 2:Data Augmentation"]) ;
+subplot(2,2,3), boxchart([Pred_psnr; Pred_psnr_aug]'),title('PSNR'), ylabel('PSNR') ,legend(["1:Original 2:Data Augmentation"]) ;
+subplot(2,2,4), boxchart([Pred_ssim; Pred_ssim_aug]'),title('SSIM'), ylabel('SSIM') ,legend(["1:Original 2:Data Augmentation"]) ;
+
 
 %% Evaluate Network
 % calculate RMSE, Correlation, SSIM, PSNR

@@ -48,6 +48,8 @@ options.ValidationData = {XValid, YValid};
 
 options.Plots = 'training-progress';
 
+options.OutputNetwork = 'best-validation-loss';
+
 options.ValidationPatience = 20;
 
 %% training using "trainNetwork"
